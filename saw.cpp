@@ -35,7 +35,7 @@ void dumpLocation(Point p) {
     printf("%03i,%03i\n",p.x,p.y);
 }
 
-void move(Point *p) {
+int move(Point *p) {
 
 
     int dir = rand()%4; // 0 to 3 inclusive
@@ -48,6 +48,7 @@ void move(Point *p) {
         case 3: (*p).x--; break; // W
         default: printf("ERROR! dir was %i\n", dir); break;
     } 
+    return 0;
 }
 
 int avoidMove(Point *p, vector<Point> *history) {
@@ -97,6 +98,7 @@ void SAW(int maxSteps, int *nSteps, int *maxX, int *maxY, int *maxRSq, int *endX
         pointsHistory.push_back(p);
 
         status = avoidMove(&p, &pointsHistory);
+        //status = move(&p);
         if(status == -1) break; // can't move anywhere
 
         if(abs(p.x) > abs(*maxX)) *maxX = p.x;
@@ -117,12 +119,15 @@ int main() {
 
     srand(time(NULL));
 
-    int nSteps=0, maxX=0, maxY=0, maxRSq=0, endX=0, endY=0;
 
-    for(int i = 0; i < 10000; i++) {
-        SAW(1000, &nSteps, &maxX, &maxY, &maxRSq, &endX, &endY);
+    for(int i = 0; i < 50000; i++) {
+        int nSteps=0, maxX=0, maxY=0, maxRSq=0, endX=0, endY=0;
 
-        cout << nSteps << " " << maxX << " " << maxY << " " << maxRSq << " " << endX << " " << endY << endl;
+        SAW(i, &nSteps, &maxX, &maxY, &maxRSq, &endX, &endY);
+
+        printf("%10i %10i %10i %10i %10i\n",nSteps,maxX,maxY,maxRSq,endX,endY);
+        //cout << nSteps << " " << maxX << " " << maxY << " " << maxRSq << " " << endX << " " << endY << endl;
+        //cout << nSteps << " " << maxX << " " << maxY << " " << maxRSq << " " << endX << " " << endY << endl;
     }
     /*Point p = { }; // in C++, this sets all members to 0
     vector<Point> pointsHistory;
