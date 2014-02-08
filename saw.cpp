@@ -6,7 +6,7 @@
 #include <math.h>
 #include <time.h>
 
-
+#define AVOIDING 1
 
 using namespace std;
 
@@ -15,11 +15,17 @@ struct Point
     int x;
     int y;
 
-    /*Point()
-      {
-      x = 0;
-      y = 0;
-      }*/
+};
+
+
+struct Data
+{
+    int nSteps;
+    int maxX;
+    int maxY;
+    int maxRSq;
+    int endX;
+    int endY;
 };
 
 bool operator==(Point p1, Point p2) {
@@ -28,6 +34,10 @@ bool operator==(Point p1, Point p2) {
 
 void printLocation(Point p) {
     printf("(x,y) = (%03i,%03i)\n",p.x,p.y);
+}
+
+void printData(Data data) {
+    printf("%10i %10i %10i %10i %10i %10i\n",data.nSteps,data.maxX,data.maxY,data.maxRSq,data.endX,data.endY);
 }
 
 
@@ -88,7 +98,7 @@ int avoidMove(Point *p, vector<Point> *history) {
     return 0;
 }
 
-void SAW(int maxSteps, int *nSteps, int *maxX, int *maxY, int *maxRSq, int *endX, int *endY) {
+void SAW(int maxSteps, Data * data) {
     Point p = { }; // in C++, this sets all members to 0
     vector<Point> pointsHistory;
     int status;
@@ -97,20 +107,23 @@ void SAW(int maxSteps, int *nSteps, int *maxX, int *maxY, int *maxRSq, int *endX
         //move(&p);
         pointsHistory.push_back(p);
 
-        status = avoidMove(&p, &pointsHistory);
-        //status = move(&p);
+        if(AVOIDING) {
+            status = avoidMove(&p, &pointsHistory);
+        } else {
+            status = move(&p);
+        }
         if(status == -1) break; // can't move anywhere
 
-        if(abs(p.x) > abs(*maxX)) *maxX = p.x;
-        if(abs(p.y) > abs(*maxY)) *maxY = p.y;
-        if(p.x*p.x + p.y*p.y > *maxRSq) *maxRSq = p.x*p.x + p.y*p.y;
+        if(abs(p.x) > abs((*data).maxX)) (*data).maxX = p.x;
+        if(abs(p.y) > abs((*data).maxY)) (*data).maxY = p.y;
+        if(p.x*p.x + p.y*p.y > (*data).maxRSq) (*data).maxRSq = p.x*p.x + p.y*p.y;
         //dumpLocation(p);
     }
 
-    *endX = p.x;
-    *endY = p.y;
+    (*data).endX = p.x;
+    (*data).endY = p.y;
 
-    *nSteps = pointsHistory.size();
+    (*data).nSteps = pointsHistory.size();
 
 
 }
@@ -121,34 +134,9 @@ int main() {
 
 
     for(int i = 0; i < 50000; i++) {
-        int nSteps=0, maxX=0, maxY=0, maxRSq=0, endX=0, endY=0;
-
-        SAW(i, &nSteps, &maxX, &maxY, &maxRSq, &endX, &endY);
-
-        printf("%10i %10i %10i %10i %10i\n",nSteps,maxX,maxY,maxRSq,endX,endY);
-        //cout << nSteps << " " << maxX << " " << maxY << " " << maxRSq << " " << endX << " " << endY << endl;
-        //cout << nSteps << " " << maxX << " " << maxY << " " << maxRSq << " " << endX << " " << endY << endl;
+        Data d = { }; // sets members to 0
+        SAW(i, &d);
+        printData(d);
     }
-    /*Point p = { }; // in C++, this sets all members to 0
-    vector<Point> pointsHistory;
-    int status;
-    int maxX=0, maxY=0, maxRSq=0;
-    //printLocation(p);
-    for(int i = 0; i < 20000; i++) {
-        //move(&p);
-        pointsHistory.push_back(p);
-
-        status = avoidMove(&p, &pointsHistory);
-        if(status == -1) break; // can't move anywhere
-
-        if(p.x > maxX) maxX = p.x;
-        if(p.y > maxY) maxY = p.y;
-        if(p.x*p.x + p.y*p.y > maxRSq) maxRSq = p.x*p.x + p.y*p.y;
-        dumpLocation(p);
-    }
-
-    cout << pointsHistory.size() << " " << maxX << " " << maxY << " " << maxRSq << endl;
-
-*/
     return 0;
 }
